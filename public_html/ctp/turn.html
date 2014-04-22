@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+		<script src="jquery.min.js"></script>
+		<script src="jquery.keybind.js"></script>
+		<script src="key.js"></script>
+		<script type="text/javascript">
+			var bullets = new Array();
+
+			$(function() {
+				Keyboard_Init();
+
+				setInterval(function(){
+					myTank.move();
+					for (var i in bullets) {
+						bullets[i].move();
+					}
+					draw();
+				}, 20);
+			});
+
+			var Tank = function() {
+				this.x = 224;
+				this.y = 144;
+				this.angle = -Math.PI / 2;
+
+				this.move = function() {
+					if (key.right) {
+						this.angle += 0.02;
+					}
+					if (key.left) {
+						this.angle -= 0.02;
+					}
+					if(key.down) {
+						this.x -= Math.cos(this.angle) * 0.3;
+						this.y -= Math.sin(this.angle) * 0.3;
+					}
+					if (key.up) {
+						this.x += Math.cos(this.angle) * 0.8;
+						this.y += Math.sin(this.angle) * 0.8;
+					}
+					if (key.space) {
+						bullets.push(new Bullet(this.x, this.y, Math.cos(this.angle), Math.sin(this.angle)));
+					}
+				}
+			}
+
+			var Bullet = function(posX, posY, vecX, vecY) {
+				this.x = posX;
+				this.y = posY;
+
+				this.vectorX = vecX;
+				this.vectorY = vecY;
+
+				var magnitude  = Math.sqrt(Math.pow(this.vectorX, 2) + Math.pow(this.vectorY, 2));
+				this.vectorX /= magnitude;
+				this.vectorY /= magnitude;
+
+				$('#screen').append('<p id="bullet-' + bullets.length + '" class="bullet"></p>');
+
+				this.move = function() {
+					if ((this.x <= 0) || (this.x >= 480) || (this.y <= 0) || (this.y >= 320)) {
+						return;
+					} else {
+						this.x += this.vectorX * 2;
+						this.y += this.vectorY * 2;
+					}
+				}
+			}
+
+			function draw() {
+				$('#tank').css('left', myTank.x - 16).css('top', myTank.y - 16).css('-webkit-transform', 'rotate(' + (Math.round(180 * myTank.angle / Math.PI) + 90) + 'deg)');
+				for (var i in bullets) {
+					$('#bullet-' + i).css('left', bullets[i].x - 3).css('top', bullets[i].y - 3);
+				}
+				if (i) {
+					logow('myTank.x: ' + myTank.x + '<br>myTank.y: ' + myTank.y + '<br>myTank.angle: ' + myTank.angle + '<br>bullet.x: ' + bullets[i].x + '<br>bullet.y: ' + bullets[i].y + '<br>bullet.vectorX: ' + bullets[i].vectorX + '<br>bullet.vectorY: ' + bullets[i].vectorY);
+				} else {
+					logow('myTank.x: ' + myTank.x + '<br>myTank.y: ' + myTank.y + '<br>myTank.angle: ' + myTank.angle);
+				}
+			}
+
+			function log(text) {
+				$('#log').html(text + '<br>' + $('#log').html());
+			}
+
+			function logow(text) {
+				$('#logow').html(text);
+			}
+
+			var myTank = new Tank();
+		</script>
+
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			#screen {
+				position: relative;
+				margin: auto;
+				width: 480px;
+				height: 320px;
+				border: 1px dotted black;
+				margin: 100px auto;
+			}
+
+			#tank {
+				width: 32px;
+				height: 32px;
+				top: 224px;
+				left: 144px;
+				background-color: #fc6;
+				position: absolute;
+				color: white;
+				text-align: center;
+				line-height: 32px;
+			}
+
+			.bullet {
+				width: 15px;
+				height: 15px;
+				border-radius: 15px;
+				position: absolute;
+				background-color: black;
+			}
+		</style>
+
+		<title>Demo</title>
+	</head>
+	<body>
+		<div id="screen">
+			<p id="tank">▲</p>
+		</div>
+		<div id="log"></div>
+		<div id="logow"></div>
+	</body>
+</html>

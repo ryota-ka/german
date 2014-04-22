@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+		<script src="jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function(){
+				topicDom = $('#topic');
+				playersDom = $('#players');
+				newtopicDom = $('#newtopic');
+				listDom = $('#list');
+				historyDom = $('#history');
+
+				var topics = [
+					'前期でおもしろかった講義',
+					'前期でおもしろくなかった講義',
+					'好きなビデオゲーム',
+					'第ニ外国語について',
+					'大学・学部を選んだ理由',
+					'趣味',
+					'昨日の夕食',
+					'一昨日の夕食',
+					'好きな音楽',
+					'好きなスポーツ',
+					'高校を選んだ理由',
+					'歳をとったなと思う瞬間',
+					'好きな食べ物',
+					'嫌いな食べ物',
+					'今日の当たり目',
+					'自分の長所',
+					'自分の短所',
+					'好きなテレビ番組',
+					'好きなマンガ',
+					'最近読んだマンガ',
+					'好きな本',
+					'最近読んだ本',
+					'好きな映画',
+					'最近見た映画',
+					'好きな公式・定理',
+					'好きな色',
+					'今欲しいもの',
+					'尊敬する人物',
+					'アルバイト',
+					'得意なこと',
+					'苦手なこと',
+					'高校のとき好きだった教科',
+					'高校のとき嫌いだった教科',
+					'Twitter クライアント',
+					'好きな特殊関数',
+					'受験の思い出',
+					'好きな言語',
+					'好きな麻雀役',
+					'高校の部活動',
+					'好きな哲学者',
+					'これなしでは生きられないというもの',
+					'最近気になったニュース',
+					'休日の過ごし方',
+					'料理',
+					'てか、LINEやってる？笑',
+					'国語の教科書で好きだった作品'
+				];
+
+				var players = [
+					'Colonel_Si',
+					'invendu',
+					'kyocou1018',
+					'mitchi_math',
+					'mnmkzk1221',
+					'sein0122',
+					'tk_matsutaku',
+					'V7jp'
+				];
+
+				var datetimes = [];
+
+				for (i=0; i<topics.length; i++) {
+					listDom.append('<li class="topic">' + topics[i] + '</li>');
+				}
+
+				for(i=0; i<players.length; i++) {
+					if (!(i % 4)) {
+						playersDom.append('<div class="horizontal_box"></div>');
+						newestPlayerWrapperDom = $('#players').children(':eq(' + Math.floor(i/4) + ')');
+					}
+					newestPlayerWrapperDom.append('<p class="player">' + players[i] + "</p>");
+				}
+
+				$('#button').click(function(){
+					chooseTopic(Math.floor(Math.random() * listDom.children().length));
+				});
+
+				$('.player').click(function(){
+					$(this).toggleClass('selected');
+				});
+
+				$('.topic').live('click', function(){
+					chooseTopic($('.topic').index(this));
+				});
+
+				$('form').submit(function(){
+					var content = newtopicDom.val();
+					if (content != '') {
+						listDom.prepend('<li class="topic">' + content + '</li>');
+						newtopicDom.val('');
+					}
+					return false;
+				});
+
+				$('#history_icon').click(function(){
+					if ($(this).hasClass('selected')) {
+						$(this).removeClass('selected').css({'background-image': 'url("./history.png")'});
+						historyDom.stop().animate({'left': '-200px'});
+					} else {
+						$(this).addClass('selected').css({'background-image': 'url("./history_hover.png")'});;
+						rewriteDate();
+						historyDom.css('height', $(document).height()).stop().animate({'left': '0px'});
+					}
+				});
+
+				function chooseTopic(index) {
+					var year, month, day, hour, minute, second;
+					selectedPlayerNumber = $('.player.selected').length;
+					if (selectedPlayerNumber) {
+						chosenTopic = $('.topic:eq(' + index +')');
+						playerName = $('.player.selected:eq(' + Math.floor(Math.random() * selectedPlayerNumber) + ')').text();
+
+						topicDom.text(chosenTopic.text() + ' (' + playerName + ')');
+
+						date = new Date();
+						datetimes.unshift(date.getTime());
+
+						year = date.getFullYear();
+						month = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : date.getMonth();
+						day = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
+						hour = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+						minute = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+						second = (date.getSeconds() < 10) ? "0" + date.getSeconds() : date.getSeconds();
+
+						datetime = year + '/' +  month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
+
+						historyDom.prepend('<div><p class="history_topic">' + chosenTopic.text() + '</p><p class="info">' + playerName + ' <span class="datetime" title="' + datetime + '">now</span></p></div>');
+						chosenTopic.remove();
+					} else {
+						topicDom.text('プレイヤーが選択されていません');
+					}
+				}
+
+				rewriteDate = function() {
+					var diff, now, text;
+					if ($('#history_icon').hasClass('selected')) {
+						now = new Date();
+						for (i=0; i<datetimes.length; i++) {
+							diff = Math.floor((now.getTime() - datetimes[i]) / 1000);
+							if (diff < 60) {
+								text = 'now';
+							} else if (diff < 3600) {
+								text = Math.floor(diff / 60) + ' minutes ago';
+							} else if (diff < 86400) {
+								text = Math.floor(diff / 3600) + ' hours ago';
+							} else {
+								text = Math.floor(diff / 86400) + ' days ago';
+							}
+							$('#history .datetime:eq(' + i + ')').text(text);
+						}
+					}
+				}
+
+				setInterval(rewriteDate, 60000);
+			});
+		</script>
+
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			html {
+				width: 100%;
+				height: 100%;
+			}
+
+			body {
+				font-family: Meiryo;
+				color: #444;
+				width: 100%;
+				height: 100%;
+			}
+
+			#container {
+				width: 600px;
+				margin: 30px auto;
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-box-align: center;
+			}
+
+			#topic {
+				width: 555px;
+				height: 30px;
+				line-height: 30px;
+				font-size: 15px;
+				text-align: left;
+				margin: 10px;
+			}
+
+			#button {
+				width: 100px;
+				height: 62px;
+				background-color: #87cefa;
+				color: white;
+				line-height: 62px;
+				font-size: 20px;
+				text-align: center;
+				cursor: pointer;
+			}
+
+			#button:hover {
+				background-color: #00bfff;
+			}
+
+			#players {
+				margin: 20px 0;
+				-webkit-box-orient: vertical;
+			}
+
+			.horizontal_box {
+				display: -webkit-box;
+				-webkit-box-orient: horizontal;
+				-webkit-box-align: center;
+			}
+
+			#players div p {
+				height: 30px;
+				width: 140px;
+				line-height: 30px;
+				text-align: center;
+				color: white;
+				background: #87cefa;
+				margin: 1px;
+				cursor: pointer;
+			}
+
+			#players div p.selected, #players div p:hover {
+				background: #00bfff;
+			}
+
+			#newtopic {
+				width: 523px;
+				height: 25px;
+				margin-top: 10px;
+				padding: 1px 5px;
+				border: 1px dotted #00bfff;
+			}
+
+			#history_icon {
+				width: 32px;
+				height: 32px;
+				background-image: url('./history.png');
+				background-position: 2px 5px;
+				background-repeat: no-repeat;
+				cursor: pointer;
+			}
+
+			#history_icon:hover {
+				background-image: url('./history_hover.png');
+			}
+
+			#list {
+				list-style-type: none;
+				margin-top: 30px;
+				-webkit-box-orient: vertical;
+			}
+
+			#list li {
+				position: relative;
+				width: 508px;
+				padding: 10px 30px;
+				border-bottom: 1px dotted #00bfff;
+				cursor: pointer;
+			}
+
+			#list li:first-child {
+				border-top: 1px dotted #00bfff;
+			}
+
+			#list li:hover {
+				background-color: #e0f0f9;
+			}
+
+			#list li:hover:before {
+				content: "▶";
+				color: #f64;
+				position: absolute;
+				top: 10px;
+				left: 8px;
+			}
+
+			#history {
+				width: 200px;
+				height: 100%;
+				min-height: 100%;
+				position: absolute;
+				top: 0px;
+				left: -200px;
+				background-color: #87cefa;
+				color: #fff;
+				font-size: 14px;
+				padding-top: 5px;
+			}
+
+
+			#history div {
+				width: 190px;
+				margin-left: 5px;
+				padding-bottom: 5px;
+				border-bottom: 1px dotted #fff;
+				margin-bottom: 5px;
+			}
+
+			#history div .info {
+				color: #f8f8f8;
+				font-size: 12px;
+				text-align: right;
+			}
+		</style>
+
+		<title>Chatting Topic Provider</title>
+	</head>
+	<body>
+		<div id="container">
+			<p id="topic"></p>
+			<p id="button">choose</p>
+			<div id="players"></div>
+			<div class="horizontal_box">
+				<form>
+					<input id="newtopic" type="text" />
+				</form>
+				<p id="history_icon"></p>
+			</div>
+			<ul id="list"></ul>
+		</div>
+		<div id="history"></div>
+	</body>
+</html>

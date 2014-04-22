@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script>
+	var ws = new WebSocket("ws://127.0.0.1:8000/echo");
+
+	ws.onclose = function(event) {
+		alert("websocket " + event + " is closed");
+	};
+
+	ws.onerror = function(event) {
+		alert("websocket " + event + " is error");
+	};
+
+	ws.onopen = function(event) {
+		alert("websocket " + event + " is opened");
+	};
+
+	ws.onmessage = function(event) {
+		var chatarea = document.getElementById("chatarea");
+		chatarea.value = chatarea.value + "\n" + event.data;
+	};
+
+	function send() {
+		var msg = document.getElementById("msg");
+		ws.send(msg.value);
+		msg.value = '';
+		return false;
+	}
+</script>
+</head>
+<body>
+
+<textarea id="chatarea"></textarea>
+<textarea id="msg">hoge</textarea>
+
+<button onclick="send()" />send</button>
+
+</body>
+</html>

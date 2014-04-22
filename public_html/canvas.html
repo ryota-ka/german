@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href='http://fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+		<script type="text/javascript">
+			onload = function() {
+				draw();
+			};
+
+			function refreshWallNumber() {
+				var canvas = document.getElementById('wallNumber');
+				var ctx = canvas.getContext('2d');
+
+				var xPos = canvas.offsetWidth / 2;
+				var yPos = canvas.offsetHeight / 2;
+
+				var radius = 45;
+				var percentage = 70;
+				var boundary;
+
+				if (percentage == 0) {
+					percentage = 100;
+				} else if (percentage == 100) {
+					percentage = 0;
+				}
+				boundary = (75 - percentage) * Math.PI / 50;
+
+				ctx.lineWidth = 2;
+
+				ctx.beginPath();
+				ctx.arc(xPos, yPos, radius, -0.5 * Math.PI, boundary, true);
+				ctx.strokeStyle = "rgb(64,204,64)"
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.arc(xPos, yPos, radius, boundary, 1.5 * Math.PI, true);
+				ctx.strokeStyle = "rgba(96,96,96,.5)"
+				ctx.stroke();
+			}
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div>
+			<canvas id="wallNumber" width="100" height="100" style="border: solid 1px black; position: absolute; top: 0; left: 0;"></canvas>
+		</div>
+	</body>
+</html>

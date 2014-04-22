@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="css/client.css">
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/json2.js"></script>
+
+		<script src="js/jquery-ui.js"></script>
+		<script src="js/jquery.ui.mouse.js"></script>
+		<script src="js/jquery.ui.widget.js"></script>
+		<script src="js/jquery.ui.sortable.js"></script>
+		<script src="js/jquery.cookie.js"></script>
+		<script src="js/german.js"></script>
+		<script src="js/socket.js"></script>
+
+		<meta charset=utf-8 />
+
+		<title>German</title>
+	</head>
+	<body>
+		<div id="status" class="offline">offline</div>
+		<div id="container">
+			<div id="sidebar">
+				<p class="room"></p>
+				<p class="round"></p>
+				<div id="pointbars">
+					<p id="deposits"><img src="./images/pointbars/1000.png" alt="供託" />×<span>0</span></p>
+					<p id="counters"><img src="./images/pointbars/100.png" alt="本場" />×<span>0</span></p>
+				</div>
+				<div id="doraIndicatorsWrapper">
+					<p class="tile reversed"></p>
+					<p class="tile reversed"></p>
+					<p class="tile reversed"></p>
+					<p class="tile reversed"></p>
+					<p class="tile reversed"></p>
+				</div>
+				<div id="log"></div>
+			</div>
+
+			<div class="spacer"></div>
+
+			<div id="table_wrapper">
+				<div class="spacer"></div>
+				<div id="table_and_button">
+					<div id="table">
+						<div class="floatLeft" style="width: 150px;">
+							<div id="oppositeOpenMeldsWrapper" class="openMeldsWrapper"></div>
+							<div id="leftPlayer" class="clearLeft">
+								<div id="leftDiscards" class="discardsWrapper">
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+								</div>
+							</div>
+							<div id="rightOpenMeldsWrapper" class="openMeldsWrapper"></div>
+						</div>
+
+						<div class="floatLeft" style="width: 200px;">
+							<div id="oppositePlayer">
+								<div id="oppositeDiscards" class="discardsWrapper">
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+								</div>
+							</div>
+
+							<div id="center">
+								<canvas id="wallNumber" width="100" height="100"></canvas>
+								<div id="result" class="hidden">
+									<div id="result-hand-0"></div>
+									<div id="result-hand-1"></div>
+									<div id="result-hand-2"></div>
+									<div id="result-hand-3"></div>
+								</div>
+							</div>
+
+							<div id="me">
+								<div id="myDiscards" class="discardsWrapper">
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+								</div>
+
+							</div>
+						</div>
+
+						<div class="floatLeft" style="width: 150px;">
+							<div id="leftOpenMeldsWrapper" class="openMeldsWrapper"></div>
+							<div id="rightPlayer">
+								<div id="rightDiscards" class="discardsWrapper">
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+									<div class="discardsRow"></div>
+								</div>
+							</div>
+							<div id="myOpenMeldsWrapper" class="openMeldsWrapper"></div>
+						</div>
+
+						<div>
+							<div id="myHand"></div>
+						</div>
+
+						<div>
+							<div id="arrow-box-top" class="arrow-box">ポン</div>
+							<div id="arrow-box-left" class="arrow-box">ポン</div>
+							<div id="arrow-box-right" class="arrow-box">ポン</div>
+							<div id="arrow-box-bottom" class="arrow-box">ポン</div>
+						</div>
+					</div>
+
+					<div id="buttons">
+						<p id="button-kakan" class="hidden">加槓</p>
+						<p id="button-ankan">暗槓</p>
+						<p id="button-declareReady">立直</p>
+						<p id="button-winByDraw">自摸和了</p>
+						<p id="button-pon">ポン</p>
+						<p id="button-chi" class="hidden">チー</p>
+						<p id="button-daiminkan">カン</p>
+						<p id="button-winByDiscard">ロン</p>
+						<p id="button-draw" class="hidden">ツモ</p>
+						<p id="button-kyushukyuhai" class="hidden">九種九牌</p>
+						<p id="button-lost" class="hidden">OK</p>
+					</div>
+				</div>
+				<div class="spacer"></div>
+			</div>
+
+			<div class="spacer"></div>
+		</div>
+
+		<div id="rooms" class="full-screen">
+			<div id="room-405" class="room">
+				<p class="roomNumber">405</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-403" class="room">
+				<p class="roomNumber">403</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-402" class="room">
+				<p class="roomNumber">402</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-401" class="room">
+				<p class="roomNumber">401</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-305" class="room">
+				<p class="roomNumber">305</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-303" class="room">
+				<p class="roomNumber">303</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-302" class="room">
+				<p class="roomNumber">302</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-301" class="room">
+				<p class="roomNumber">301</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-205" class="room">
+				<p class="roomNumber">205</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-203" class="room">
+				<p class="roomNumber">203</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-202" class="room">
+				<p class="roomNumber">202</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-201" class="room">
+				<p class="roomNumber">201</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-105" class="room">
+				<p class="roomNumber">105</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-103" class="room">
+				<p class="roomNumber">103</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div id="room-102" class="room">
+				<p class="roomNumber">102</p>
+				<div class="roomMembers"></div>
+			</div>
+			<div class="room">Configuration</div>
+			<div id="lobbyMembers"></div>
+		</div>
+
+		<div id="layer" class="full-screen">
+
+		</div>
+
+		<div id="startHand">
+			<p class="round"></p>
+			<div id="diceBox">
+				<p id="dice1" class="dice"></p>
+				<p id="dice2" class="dice"></p>
+			</div>
+		</div>
+
+		<div id="finishGame">
+			<table id="game-result">
+			</table>
+		</div>
+
+		<div id="draw" class="full-screen">
+			<p>流局</p>
+			<p></p>
+		</div>
+
+		<form id="chatform">
+			<input id="chatbox" type="text">
+		</form>
+		<div id="roomNumberDisplay" class="full-screen"></div>
+
+		<div id="agari-screen"></div>
+
+		<div style="display:none;">
+			<div>
+				<audio id="sound-m00-pon" preload="auto">
+					<source src="sounds/m00/pon.wav">
+				</audio>
+				<audio id="sound-m00-chi" preload="auto">
+					<source src="sounds/m00/chi.wav">
+				</audio>
+				<audio id="sound-m00-kan" preload="auto">
+					<source src="sounds/m00/kan.wav">
+				</audio>
+				<audio id="sound-m00-tsumo" preload="auto">
+					<source src="sounds/m00/tsumo.wav">
+				</audio>
+				<audio id="sound-m00-ron" preload="auto">
+					<source src="sounds/m00/ron.wav">
+				</audio>
+				<audio id="sound-m00-riichi" preload="auto">
+					<source src="sounds/m00/riichi.wav">
+				</audio>
+			</div>
+
+			<div>
+				<audio id="sound-m01-pon" preload="auto">
+					<source src="sounds/m01/pon.wav">
+				</audio>
+				<audio id="sound-m01-chi" preload="auto">
+					<source src="sounds/m01/chi.wav">
+				</audio>
+				<audio id="sound-m01-kan" preload="auto">
+					<source src="sounds/m01/kan.wav">
+				</audio>
+				<audio id="sound-m01-tsumo" preload="auto">
+					<source src="sounds/m01/tsumo.wav">
+				</audio>
+				<audio id="sound-m01-ron" preload="auto">
+					<source src="sounds/m01/ron.wav">
+				</audio>
+				<audio id="sound-m01-riichi" preload="auto">
+					<source src="sounds/m01/riichi.wav">
+				</audio>
+			</div>
+		</div>
+
+	</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+		<script src="jquery.min.js"></script>
+		<script src="jquery.keybind.js"></script>
+		<script src="key.js"></script>
+		<script type="text/javascript">
+			var tanks = new Array();
+			var bullets = new Array();
+
+			$(function() {
+				Keyboard_Init();
+
+				setInterval(function(){
+					for (var i in tanks) {
+						tanks[i].move();
+					}
+					for (var i in bullets) {
+						bullets[i].move();
+					}
+					screen.draw();
+				}, 20);
+			});
+
+			var Screen = function() {
+				var frame = 0;
+				return {
+					getFrame: function() {
+						return frame;
+					},
+					draw: function() {
+						frame++;
+
+						for (var i in tanks) {
+							$('#tank-' + i).css('left', tanks[i].getX() - 16).css('top', tanks[i].getY() - 16).css('-webkit-transform', 'rotate(' + (Math.round(180 * tanks[i].getAngle() / Math.PI) + 90) + 'deg)');
+						}
+						for (var i in bullets) {
+							$('#bullet-' + i).css('left', bullets[i].getX() - 7).css('top', bullets[i].getY() - 7);
+						}
+					}
+				}
+			}
+
+			var Tank = function(argType) {
+				var type = argType;
+				var x = 174 + argType * 100;
+				var y = 144;
+				var angle = -Math.PI / 2;
+				var lastShotFrame = 0;
+
+				return {
+					getX: function() {
+						return x;
+					},
+					getY: function() {
+						return y;
+					},
+					getAngle: function() {
+						return angle;
+					},
+					move: function() {
+						if ((!type && key.right) || (type && key.d)) {
+							angle += 0.02;
+						}
+						if ((!type && key.left) || (type && key.a)) {
+							angle -= 0.02;
+						}
+						if ((!type && key.down) || (type && key.s)) {
+							x -= Math.cos(angle) * 0.3;
+							y -= Math.sin(angle) * 0.3;
+						}
+						if ((!type && key.up) || (type && key.w)) {
+							x += Math.cos(angle) * 0.8;
+							y += Math.sin(angle) * 0.8;
+						}
+						if ((!type && key.enter) || (type && key.space)) {
+							if (lastShotFrame + 50 <= screen.getFrame()) {
+								random = Math.floor(Math.random() * 65535);
+								bullets[random] = new Bullet(random, x, y, Math.cos(angle), Math.sin(angle));
+								lastShotFrame = screen.getFrame();
+							}
+						}
+					}
+				}
+			}
+
+			var Bullet = function(argId, posX, posY, vecX, vecY) {
+				var id = argId;
+				var x = posX;
+				var y = posY;
+				var vectorX = vecX;
+				var vectorY = vecY;
+
+				var magnitude  = Math.sqrt(Math.pow(vectorX, 2) + Math.pow(vectorY, 2));
+				vectorX /= magnitude;
+				vectorY /= magnitude;
+
+				$('#screen').append('<p id="bullet-' + id + '" class="bullet"></p>');
+
+
+				return {
+					getX: function() {
+						return x;
+					},
+					getY: function() {
+						return y;
+					},
+					move: function() {
+						if ((x <= 0) || (x >= 480) || (y <= 0) || (y >= 320)) {
+							$('#bullet-' + id).remove();
+							delete bullets[id];
+							return;
+						} else {
+							x += vectorX * 2;
+							y += vectorY * 2;
+						}
+					}
+				}
+			}
+
+			tanks.push(new Tank(0));
+			tanks.push(new Tank(1));
+			var screen = new Screen();
+		</script>
+
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			#screen {
+				position: relative;
+				margin: auto;
+				width: 480px;
+				height: 320px;
+				border: 1px solid black;
+				margin: 100px auto;
+			}
+
+			#tank-0 {
+				width: 32px;
+				height: 32px;
+				top: 224px;
+				left: 144px;
+				background-color: #fc6;
+				position: absolute;
+				color: white;
+				text-align: center;
+				line-height: 32px;
+			}
+
+			#tank-1 {
+				width: 32px;
+				height: 32px;
+				top: 224px;
+				left: 144px;
+				background-color: #f64;
+				position: absolute;
+				color: white;
+				text-align: center;
+				line-height: 32px;
+			}
+
+			.bullet {
+				width: 15px;
+				height: 15px;
+				border-radius: 15px;
+				position: absolute;
+				background-color: black;
+			}
+		</style>
+
+		<title>Demo</title>
+	</head>
+	<body>
+		<div id="screen">
+			<p id="tank-0">▲</p>
+			<p id="tank-1">▲</p>
+		</div>
+		<div id="log"></div>
+		<div id="logow"></div>
+	</body>
+</html>
