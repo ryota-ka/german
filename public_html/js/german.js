@@ -226,7 +226,7 @@ function Util() {
 						if (data.inArray('chankan')) {
 							util.showButton('winByDiscard');
 							util.q.add(function() {
-								util.send('notChankan', '');
+								util.send('game/notChankan', '');
 							}, 2000);
 						}
 					}, 0, {data: data});

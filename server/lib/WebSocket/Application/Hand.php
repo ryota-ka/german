@@ -18,6 +18,7 @@ class Hand {
 	private $waitedTiles = array(array(), array(), array(), array());
 	private $oneShotAvailable = array(false, false, false, false);
 	private $whatToDo;
+	private $notChankanDeclared = array(null, null, null, null);
 	private $winByDiscardDeclared = array(null, null, null, null);
 	private $sacredDiscard = array(array(false, false, false, false), array(false, false, false, false), array(false, false, false, false), array(false, false, false, false));
 
@@ -153,6 +154,8 @@ class Hand {
 			} else {
 				if ($calling->getKind() === 3) {
 					$this->setTurnStatus(7);
+					$this->notChankanDeclared = array(false, false, false, false);
+					$this->notChankanDeclared[$this->getTurn()] = true;
 					$this->whatToDo();
 				} else {
 					$this->tileHandler->drawSupplementalTile();
@@ -284,6 +287,26 @@ class Hand {
 		return $this->readyDeclaredTurn;
 	}
 
+	public function getNotChankanDeclaredPlayers() {
+		return $this->notChankanDeclared;
+	}
+
+	public function addNotChankanDeclaredPlayer($wind) {
+		if (in_array($wind, array(0, 1, 2, 3), true)) {
+			$this->notChankanDeclared[$wind] = true;
+			if ($this->notChankanDeclared === array(true, true, true, true)) {
+				$this->notChankanDeclared = array(null, null, null, null);
+				foreach ($this->tileHandler->getOpenMeldsByWind($this->turn) as $openMeld) {
+					$kind = reset($openMeld->getTiles())->getKind();
+				}
+				$this->checkOverlooking($kind);
+				$this->tileHandler->drawSupplementalTile();
+			} else {
+				$this->whatToDo();
+			}
+		}
+	}
+
 	public function addWinByDiscardDeclaredPlayer($wind, $state) {
 		var_dump($wind);
 		var_dump($state);
@@ -313,7 +336,15 @@ class Hand {
 		if (($this->tileHandler->getWallNumber() === 0) && ($this->winByDiscardDeclared === array(false, false, false, false))) {
 			$this->exhaustiveDraw();
 		} else {
-			$pickedUp = end($this->tileHandler->getDiscardByWind($this->turn)); //槍槓の場合は違うけどね
+			if ($this->notChankanDeclared !== array(null, null, null, null)) {
+				foreach ($this->tileHandler->getOpenMeldsByWind($this->getTurn()) as $openMeld) {
+					if ($openMeld->getKind() === 3) {
+						$pickedUp = end($openMeld->getTiles());
+					}
+				}
+			} else {
+				$pickedUp = end($this->tileHandler->getDiscardByWind($this->turn));
+			}
 			$this->win($this->winByDiscardDeclared, $pickedUp);
 			$this->winByDiscardDeclared = array(null, null, null, null);
 		}
@@ -613,8 +644,13 @@ class Hand {
 				}
 			}
 		} elseif ($this->getTurnStatus() === 7) {
-			$whatToDo = array_fill(0, 4, array('chankan'));
-			$whatToDo[$this->getTurn()] = array();
+			for ($i = 0; $i < 4; $i++) {
+				if (!$this->notChankanDeclared[$i]) {
+					$whatToDo[$i] = array('winByDiscard');
+				} else {
+					$whatToDo[$i] = array();
+				}
+			}
 		}
 
 		$this->whatToDo = $whatToDo;

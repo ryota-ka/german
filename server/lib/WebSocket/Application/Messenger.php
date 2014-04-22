@@ -233,7 +233,7 @@ class Messenger {
 							break;
 
 						case 'winByDiscard':
-							if (in_array('winByDiscard', $game->getHand()->getWhatToDo()[$wind]) && is_null($game->getHand()->getWinByDiscardDeclared()[$wind])) {
+							if ((in_array('winByDiscard', $game->getHand()->getWhatToDo()[$wind]) || in_array('chankan', $game->getHand()->getWhatToDo()[$wind])) && is_null($game->getHand()->getWinByDiscardDeclared()[$wind])) {
 								echo "Your request has been accepted : $wind\n";
 								if ($data) {
 									if ($game->getHand()->getTurnStatus() !== 6) {
@@ -250,6 +250,12 @@ class Messenger {
 								}
 							} else {
 								echo "Your request cannot be accepted any more : $wind\n";
+							}
+							break;
+
+						case 'notChankan':
+							if (($game->getHand()->getTurnStatus() === 7) && in_array('chankan', $game->getHand()->getWhatToDo()[$wind])) {
+								$game->getHand()->addNotChankanDeclaredPlayer($wind);
 							}
 							break;
 
