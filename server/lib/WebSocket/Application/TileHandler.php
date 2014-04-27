@@ -886,7 +886,7 @@ class TileHandler {
 				echo "東\n";
 				$yaku[6] ++;
 			}
-		}if ($tr[28]) {
+		} if ($tr[28]) {
 			if ($wind === 1) {
 				echo "南\n";
 				$yaku[7] ++;

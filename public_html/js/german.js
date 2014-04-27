@@ -543,7 +543,9 @@ function Util() {
 											var yakuCell = document.createElement('td');
 											var yakuHan = document.createElement('td');
 											yakuCell.appendChild(document.createTextNode(arg.yakuName));
-											yakuHan.appendChild(document.createTextNode(arg.han + '飜'));
+											if (data.yakuName === '流し満貫') {
+												yakuHan.appendChild(document.createTextNode(arg.han + '飜'));
+											}
 											record.appendChild(yakuCell);
 											record.appendChild(yakuHan);
 											$('#yakuTable').append(record);
@@ -589,6 +591,8 @@ function Util() {
 								if (han < 0) {
 									var times = [null, '', 'ダブル', 'トリプル', 'クアドラプル'];
 									str = times[-han] + '役満';
+								} else if (data.yaku.yaku[34]) {
+									str = '満貫';
 								} else if (han > 0) {
 									if (han <= 4) {
 										str = han + '飜 ' + data.yaku.fu + '符' + (data.yaku.basicPoints === 2000 ? ' 満貫' : '');
@@ -892,7 +896,7 @@ OpenMeld.prototype.getHtmlElement = function() {
 function GameFunc() {
 
 	this.myWind = null;
-	this.yakuList = ['立直', '一発', '門前清自摸和', '断么九', '平和', '一盃口', '東', '南', '西', '北', '白', '發', '中', '嶺上開花', '槍槓', '海底摸月', '河底撈魚', '三色同順', '一気通貫', '混全帯么九', '七対子', '対々和', '三暗刻', '混老頭', '三色同刻', '三槓子', '小三元', 'ダブル立直', '混一色', '純全帯么九', '二盃口', '清一色', 'ドラ'];
+	this.yakuList = ['立直', '一発', '門前清自摸和', '断么九', '平和', '一盃口', '東', '南', '西', '北', '白', '發', '中', '嶺上開花', '槍槓', '海底摸月', '河底撈魚', '三色同順', '一気通貫', '混全帯么九', '七対子', '対々和', '三暗刻', '混老頭', '三色同刻', '三槓子', '小三元', 'ダブル立直', '混一色', '純全帯么九', '二盃口', '清一色', 'ドラ', '流し満貫'];
 	this.yakumanList = ['国士無双', '四暗刻', '大三元', '字一色', '小四喜', '大四喜', '緑一色', '清老頭', '四槓子', '九蓮宝燈', '天和', '地和', '人和'];
 
 	this.setMyWind = function(wind) {

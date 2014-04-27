@@ -67,34 +67,64 @@ class Hand {
 	}
 
 	public function exhaustiveDraw() {
-		echo "荒牌流局やで\n";
 		$isTempai = array(false, false, false, false);
-
 
 		/* --- 流し満貫チェック --- */
 		for ($i = 0; $i < 4; $i++) {
 			$isNagashiMangan[$i] = $this->tileHandler->isNagashiManganAvailable($i);
 		}
-
 		/* --- 流し満貫チェック --- */
 
-		/* --- ノーテン罰符 --- */
-		$count = 0;
-		for ($i = 0; $i < 4; $i++) {
-			$isTempai[$i] = $this->tileHandler->checkTempaiByWind($i);
-			$count += $isTempai[$i];
-		}
-		var_dump($isTempai);
+		if ($isNagashiMangan[0] && $isNagashiMangan[1] && $isNagashiMangan[2] && $isNagashiMangan[3]) {
+			$this->win($isNagashiMangan, true);
+		} else {
+			/* --- ノーテン罰符 --- */
+			$count = 0;
+			for ($i = 0; $i < 4; $i++) {
+				$isTempai[$i] = $this->tileHandler->checkTempaiByWind($i);
+				$count += $isTempai[$i];
+			}
+			var_dump($isTempai);
 
-		switch ($count) {
-			case 1:
-				break;
-			case 2:
-				break;
-			case 3:
-				break;
+			switch ($count) {
+				case 1:
+					for ($i = 0; $i < 4; $i++) {
+						if ($isTempai[$i]) {
+							$receiver = $i;
+							break;
+						}
+					}
+					for ($i = 0; $i < 4; $i++) {
+						$this->game->getPlayerHandler()->transferPoints(1000, $i, $receiver);
+					}
+					break;
+				case 2:
+					$receivers = array();
+					$payers = array();
+					for ($i = 0; $i < 4; $i++) {
+						if ($isTempai[$i]) {
+							$receivers[] = $i;
+						} else {
+							$payers[] = $i;
+						}
+					}
+					for ($i = 0; $i < 2; $i++) {
+						$this->game->getPlayerHandler()->transferPoints(1500, $payers[$i], $receivers[$i]);
+					}
+					break;
+				case 3:
+					for ($i = 0; $i < 4; $i++) {
+						if (!$isTempai[$i]) {
+							$payer = $i;
+						}
+					}
+					for ($i = 0; $i < 4; $i++) {
+						$this->game->getPlayerHandler()->transferPoints(1000, $payer, $i);
+					}
+					break;
+			}
+			/* --- ノーテン罰符 --- */
 		}
-		/* --- ノーテン罰符 --- */
 
 		$this->game->finishHand($isTempai[0], true);
 	}
@@ -362,7 +392,7 @@ class Hand {
 
 				/* --- フリテンチェック --- */
 				$isSacredDiscard = false;
-				if (!is_null($pickedUp)) {
+				if (!is_null($pickedUp) && ($pickedUp !== true)) {
 					if ($this->isSacredDiscard($i)) {
 						$isSacredDiscard = true;
 					} else {
@@ -378,6 +408,14 @@ class Hand {
 
 				if ($isSacredDiscard) {
 					$yaku = 0;
+				} elseif ($pickedUp === true) {
+					$yaku = array();
+					$emptyArray = array_fill(0, 34, 0);
+					$emptyArray[34] = 1;
+					$yaku['yaku'] = $emptyArray;
+					$yaku['yakuman'] = array(0);
+					$yaku['han'] = 1;
+					$yaku['basicPoints'] = 2000;
 				} else {
 					$yaku = $this->tileHandler->getYaku($i, $pickedUp);
 				}
@@ -416,7 +454,7 @@ class Hand {
 					$quadruple = ceil($yaku['basicPoints'] / 25) * 100;
 					$sextuple = ceil($yaku['basicPoints'] * 6 / 100) * 100;
 				}
-				if (is_null($pickedUp)) { // ツモ和了
+				if (is_null($pickedUp) || ($pickedUp === true)) { // ツモ和了
 					if ($i === 0) {
 						$diffs = array($double * 3, -$double, -$double, -$double);
 					} else {
